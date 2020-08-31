@@ -25,6 +25,7 @@
 #include <assert.h>
 #include <string>
 #include <array>
+#include <utility>
 
 // Ignore the intellisense error "cannot open source file" for .shh files.
 // They will be created during the build sequence before the preprocessor runs.
@@ -303,7 +304,7 @@ void Graphics::EndFrame()
 
 void Graphics::BeginFrame()
 {
-	// clear the sysbuffer
+	// clear the sysbuffers
 	memset( pSysBuffer,0u,sizeof( Color ) * Graphics::ScreenHeight * Graphics::ScreenWidth );
 }
 
@@ -314,6 +315,50 @@ void Graphics::PutPixel( int x,int y,Color c )
 	assert( y >= 0 );
 	assert( y < int( Graphics::ScreenHeight ) );
 	pSysBuffer[Graphics::ScreenWidth * y + x] = c;
+}
+
+void Graphics::DrawLine(Vec2 p0, Vec2 p1, Color c)
+{
+	float m;
+	if (p1.x != p0.x)			// if we don't have a vertcal line
+	{
+		m = (p1.y - p0.y) / (p1.x - p0.x);
+	}
+
+	if (p1.x != p0.x && std::abs(m) <= 1.0f) // then we have a horizonalish line
+	{
+		if (p0.x > p1.x)
+		{
+			std::swap(p0, p1);
+		}
+
+		m = (p1.y - p0.y) / (p1.x - p0.x);
+		const float b = p0.y - m * p0.x;
+
+		for (int x = (int)p0.x; x < (int)p1.x; x++)
+		{
+			const float y = m * (float)x + b;
+			PutPixel(x, (int)y, c);
+		}
+	}
+	else
+	{
+		if (p0.y > p1.y)
+		{
+			std::swap(p0, p1);
+		}
+		const float w = (p1.x - p0.x) / (p1.y - p0.y);	
+		const float p = p0.x - w * p0.y;
+
+		for (int y = (int)p0.y; y < (int)p1.y; y++)
+		{
+			const float x = w * (float)y + p;
+			PutPixel((int)x, y, c);
+		}
+
+	}
+
+	
 }
 
 

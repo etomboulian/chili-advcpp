@@ -35,6 +35,10 @@ public:
 		:
 		_Vec2( vect.x,vect.y )
 	{}
+	template <typename NUM>
+	_Vec2(const std::pair<NUM, NUM> p)
+		: _Vec2(p.first, p.second)
+	{}
 	template <typename T2>
 	explicit operator _Vec2<T2>() const
 	{
@@ -119,6 +123,8 @@ public:
 	{
 		return !(*this == rhs);
 	}
+
+
 public:
 	T x;
 	T y;
